@@ -1,4 +1,3 @@
-import os 
 import subprocess
 
 #Checks and runs the setup.sh file for the first time
