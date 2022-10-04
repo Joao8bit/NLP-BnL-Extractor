@@ -2,8 +2,6 @@
 
 import utils as u
 from utils import *
-#Initialization of an XMl file for testing purposes
-tree = ET.parse('257048-ADVERTISEMENT-DTL303.xml')
 
 #We want to keep track of the different tags that might interest us
 #here from the XML files structure
@@ -23,6 +21,7 @@ tag_dict={
 
 def main():
     initial_setup()
+    tree = ET.parse('257048-ADVERTISEMENT-DTL303.xml')  #Initialization of an XMl file for testing purposes
     extract_tag(tree, tag_dict["description"])
     print('\nLang = ')
     print_lang(extract_tag(tree, tag_dict))
