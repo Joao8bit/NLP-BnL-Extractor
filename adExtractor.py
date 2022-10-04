@@ -35,11 +35,9 @@ def extract_tag(tag_name):
     root = tree.getroot()
 
     #Print data from the specified tag
-    for tag in tag_dict:
-        for node in tree.iter():
-            print('\n')
-            for elem in node.iter():
-                print("{}: {}".format(format_tag(elem), elem.text))
+    for node in tree.iter(tag_name):
+        for elem in node.iter():
+            print("{}: {}".format(format_tag(elem), elem.text))
 
 def format_tag(elem):
     return elem.tag.replace("{http://purl.org/dc/elements/1.1/}","")
