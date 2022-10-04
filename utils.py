@@ -34,6 +34,7 @@ def extract_all_tags(tree, tag_dict):
         extract_tag(tree, tag_dict)
 
 def format_tag(elem):
+    #Tags have ugly naming, this helps a bit
     return str(elem.tag.replace("{http://purl.org/dc/elements/1.1/}","")).capitalize()
 
 def get_lang_detector(nlp, name):

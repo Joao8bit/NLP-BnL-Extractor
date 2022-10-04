@@ -16,9 +16,6 @@ tag_dict={
     "type": "{http://purl.org/dc/elements/1.1/}type"
 }
 
-
-#Tags have ugly naming, this helps a bit
-
 def main():
     initial_setup()
     tree = ET.parse('257048-ADVERTISEMENT-DTL303.xml')  #Initialization of an XMl file for testing purposes
