@@ -35,7 +35,7 @@ def extract_tag(tag_name):
     #Print data from the specified tag
     for node in tree.iter(tag_name):
         for elem in node.iter():
-            print("{}: {}".format(format_tag(elem), elem.text))
+            print(f"{format_tag(elem)}: {elem.text}")
 
 def extract_all_tags():
     for tag in tag_dict:
