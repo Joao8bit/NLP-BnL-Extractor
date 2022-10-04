@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 
-import os
-import subprocess
-from spacy.language import Language
-from spacy_language_detection import LanguageDetector
-from xml.etree import cElementTree as ET
-
+import utils as u
+from utils import *
 #Initialization of an XMl file for testing purposes
 tree = ET.parse('257048-ADVERTISEMENT-DTL303.xml')
 
@@ -21,41 +17,15 @@ tag_dict={
     "title": "{http://purl.org/dc/elements/1.1/}title",
     "type": "{http://purl.org/dc/elements/1.1/}type"
 }
-#Checks and runs the setup.sh file for the first time if the folder ./ADS/ does not yet exist
-def initial_setup():
-    isExist = os.path.exists('./ADS/')
-    if(isExist == False):
-        subprocess.run(['bash', 'setup.sh'])
-    else:
-        pass
 
-def extract_tag(tag_name):
-    """
-    1. Read the XML file
-    2. Get the namespace for specific tags
-    3. Iter the needed tag name
-    4. Print the content of that tag
-    """
-    #Print data from the specified tag
-    for node in tree.iter(tag_name):
-        for elem in node.iter():
-            #print(f"{format_tag(elem)}: {elem.text}")
-            
-            #This will only print the data inside the tag, uncomment
-            #the line above to add the tag title
-            print(elem.text)
-
-def extract_all_tags():
-    for tag in tag_dict:
-        extract_tag(tag)
 
 #Tags have ugly naming, this helps a bit
-def format_tag(elem):
-    return str(elem.tag.replace("{http://purl.org/dc/elements/1.1/}","")).capitalize()
 
 def main():
     initial_setup()
-    extract_tag(tag_dict["description"])
+    extract_tag(tree, tag_dict["description"])
+    print('\nLang = ')
+    print_lang(extract_tag(tree, tag_dict))
 
 if __name__=="__main__":
     main()

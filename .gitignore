@@ -5,3 +5,6 @@ export01-newspapers1841-1878/
 #Generated folders and files for analysis purposes
 ADS/
 *ADVERTISEMENT*.xml
+
+#Python stuff
+*pycache*/
