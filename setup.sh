@@ -1,17 +1,14 @@
 #!/bin/bash
 
 case "$OSTYPE" in	#Check OS
-
   darwin*)  clear ;; 	#OSX
   linux*)   clear ;;	#Linux
   msys*)    cls ;;	#Windows
   cygwin*)  cls ;;	#Windows
-
 esac
 
-echo -e $"Downloading dataset pack...\n"
-
 #Download dataset from source
+echo -e $"Downloading dataset pack...\n"
 wget -P . https://data.bnl.lu/open-data/digitization/newspapers/export01-newspapers1841-1878.zip
 
 #Extracting zip and removing zip
