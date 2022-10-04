@@ -1,2 +1,7 @@
+#All output folders and files from download source
 export01-newspapers1841-1878/
 *COPYRIGHT*.*
+
+#Generated folders and files for analysis purposes
+ADS/
+*ADVERTISEMENT*.xml
