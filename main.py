@@ -1,5 +1,9 @@
+#!/usr/bin/env python3
+
 import os
 import subprocess
+from spacy.language import Language
+from spacy_language_detection import LanguageDetector
 from xml.etree import cElementTree as ET
 
 #Initialization of an XMl file for testing purposes
