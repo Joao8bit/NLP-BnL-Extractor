@@ -1,4 +1,3 @@
-from sys import platform
 from xml.etree import cElementTree as ET
 
 #Tag collection for target XML files
