@@ -28,7 +28,6 @@ def extract_tag(tree, tag_name):
             #the line below to add the tag title
             #print(elem.text)
             #print(f"{format_tag(elem)}: {elem.text}")
-    print(data)
     return data
 
 #TODO: To fix

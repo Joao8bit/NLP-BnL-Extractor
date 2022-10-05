@@ -3,7 +3,7 @@
 import os
 import subprocess
 from sys import platform
-from testing import description_extractor
+from project_tests.testing import description_extractor
 from src.xml.xml_manipulation import *
 
 #Checks and runs the setup.sh file for the first time if the folder ./ADS/ does not yet exist
