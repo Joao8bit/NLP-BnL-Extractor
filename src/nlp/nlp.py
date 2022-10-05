@@ -3,13 +3,30 @@ from spacy.language import Language
 from spacy_language_detection import LanguageDetector
 from langdetect import detect
 
+lang_record = ["de", 0, "fr", 0]
+
+#Start Spacy Components
 def get_lang_detector(nlp, name):
     return LanguageDetector(seed=42)  # We use the seed 42
+nlp_model = spacy.load("en_core_web_sm")
+Language.factory("language_detector", func=get_lang_detector)
+nlp_model.add_pipe('language_detector', last=True)
 
 def get_lang(data):
     # Document level language detection
-    nlp_model = spacy.load("en_core_web_sm")
-    Language.factory("language_detector", func=get_lang_detector)
-    nlp_model.add_pipe('language_detector', last=True)
+    
     doc = nlp_model(data)
-    return doc._.language
+    lang = doc._.language
+    update_lang_count(lang)
+    return lang
+
+def update_lang_count(lang):
+    if((lang["language"]) == "de"):
+        print('hi')
+        lang_record[1] += 1
+    elif((lang["language"]) == 'fr'):
+        print('hi2')
+        lang_record[3] += 1
+    
+def print_lang_count():    
+    print(lang_record)
