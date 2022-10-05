@@ -8,3 +8,4 @@ ADS/
 
 #Python stuff
 *pycache*/
+.env/
