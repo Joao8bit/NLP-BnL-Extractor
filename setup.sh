@@ -3,8 +3,6 @@
 case "$OSTYPE" in	#Check OS
   darwin*)  clear ;; 	#OSX
   linux*)   clear ;;	#Linux
-  msys*)    cls ;;	#Windows
-  cygwin*)  cls ;;	#Windows
 esac
 
 #Download dataset from source
