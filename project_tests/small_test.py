@@ -1,6 +1,6 @@
 import os
 from src.xml.xml_manipulation import *
-from nlp.spacy import *
+from src.nlp.spacy import *
 
 def description_extractor():
     root_dir = './ADS/'
