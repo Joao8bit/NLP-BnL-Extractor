@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from setup import *
 initial_setup()
 from project_tests.big_test import description_extractor

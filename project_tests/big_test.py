@@ -1,12 +1,12 @@
 import os
 from src.xml.xml_manipulation import *
-from nlp.spacy import *
+from src.nlp.spacy import *
 
 def description_extractor():
     root_dir = './ADS/'
     files = os.listdir(root_dir)
     
-    range = 1000                                             #How many files do you want to check?  
+    range = 10                                             #How many files do you want to check?  
     for file in files[:range]:
         #print(file)
         tree = ET.parse(f"{root_dir}/{file}")               #Initialization of an XMl file
