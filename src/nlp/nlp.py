@@ -14,18 +14,16 @@ nlp_model.add_pipe('language_detector', last=True)
 
 def get_lang(data):
     # Document level language detection
-    
     doc = nlp_model(data)
     lang = doc._.language
     update_lang_count(lang)
+    #print(lang)                #Uncomment for debugging purposes
     return lang
 
 def update_lang_count(lang):
     if((lang["language"]) == "de"):
-        print('hi')
         lang_record[1] += 1
     elif((lang["language"]) == 'fr'):
-        print('hi2')
         lang_record[3] += 1
     
 def print_lang_count():    
