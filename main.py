@@ -3,7 +3,7 @@
 import os
 import subprocess
 from sys import platform
-from project_tests.small_test import description_extractor
+from project_tests.big_test import description_extractor
 
 #Checks and runs the setup.sh file for the first time if the folder ./ADS/ does not yet exist
 def initial_setup():
