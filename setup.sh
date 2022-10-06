@@ -2,8 +2,10 @@
 
 #Installing all requirements in virtual env for python3
 echo "Installing requirements for this project"
+python3 -m venv .env
+source .env/bin/activate
 pip install -r requirements.txt
-python -m spacy download en_core_web_sm
+python3 -m spacy download en_core_web_sm
 
 case "$OSTYPE" in       #Check OS
   darwin*)  clear ;;    #OSX
