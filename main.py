@@ -4,7 +4,7 @@ initial_setup()
 
 import os
 from src.xml.xml_manipulation import *
-import project_tests.csv as csv
+import src.csv.csv as csv
 
 def main():    
     root_dir = './ADS/'
