@@ -9,7 +9,7 @@ import src.csv.csv as csv
 def main():    
     root_dir = './ADS/'
     files = os.listdir(root_dir)
-    csv.write_to_csv(root_dir, files[:500])
+    csv.write_to_csv(root_dir, files[:5])
 
 if __name__=="__main__":
     main()
