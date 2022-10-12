@@ -12,6 +12,9 @@ tag_dict={
     "type": "{http://purl.org/dc/elements/1.1/}type"
 }
 
+def open_xml(path, file):
+    return ET.parse(f"{path}/{file}")               #Initialization of an XMl file
+
 def extract_tag(tree, tag_name):
     """
     1. Read the XML file
@@ -20,7 +23,6 @@ def extract_tag(tree, tag_name):
     4. Print the content of that tag
     """
     data=''
-    #Print data from the specified tag
     for node in tree.iter(tag_name):
         data = data + node.text
         #for elem in node.iter():    #This helps with tags with multiple children, shouldn't be the case
@@ -34,9 +36,10 @@ def extract_tag(tree, tag_name):
 #def extract_childless_tag(tree, tag_name):
 #    return tree.iter(tag_name)
 
-def extract_all_tags(tree, tag_dict):
-    for tag in tag_dict:
-        extract_tag(tree, tag_dict)
+#TODO: To fix function if needed
+#def extract_all_tags(tree, tag_dict):
+#    for tag in tag_dict:
+#        extract_tag(tree, tag_dict)
 
 def format_tag(elem):
     #Tags have ugly naming, this helps a bit

@@ -1,6 +1,7 @@
-#All output folders and files from download source
+#Generated files
 export01-newspapers1841-1878/
 *COPYRIGHT*.*
+*.csv
 
 #Generated folders and files for analysis purposes
 ADS/
@@ -9,3 +10,4 @@ ADS/
 #Python stuff
 *pycache*/
 .env/
+
