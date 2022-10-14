@@ -12,3 +12,5 @@ def initial_setup():
         #    subprocess.run(['setup.bat'])
     else:
         pass
+
+initial_setup()
