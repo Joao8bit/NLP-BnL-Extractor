@@ -2,8 +2,11 @@ import os
 import subprocess
 from sys import platform
 
-#Checks and runs the setup.sh file for the first time if the folder ./ADS/ does not yet exist
 def initial_setup():
+    """
+    We check if the ADS/ folder exists, as it is created with this precise script.
+    If it does not yet exist, we run setup.sh.
+    """
     isExist = os.path.exists('./ADS/')
     if(isExist == False):
         if(platform == "linux" or platform == "linux2" or platform == "darwin"):
