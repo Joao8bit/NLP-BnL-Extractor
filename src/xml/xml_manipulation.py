@@ -14,7 +14,7 @@ tag_dict={
 
 def open_xml(path, file):
     """
-    Returns 
+    Opens an XML file, allows for an open/close approach.
     """
     return ET.parse(f"{path}/{file}")               #Initialization of an XMl file
 
@@ -40,17 +40,9 @@ def extract_tag(tree, tag_name):
 #    return tree.iter(tag_name)
 
 def format_tag(elem):
-    #Tags have ugly naming, this helps a bit
+    """
+    Tags have ugly naming, this helps a bit.
+    Mainly designed for printing purposes.
+    """
     return str(elem.tag.replace("{http://purl.org/dc/elements/1.1/}","")).capitalize()
 
-def get_xml_data(tree):
-    """
-    This function will gather all the information about a single XML file that will be written
-    Inside the CSV file, along with the language detection data.
-    """   
-    row_data = [extract_tag(tree, tag_dict["source"]),
-                extract_tag(tree, tag_dict["date"]),
-                extract_tag(tree, tag_dict["publisher"]),
-                extract_tag(tree, tag_dict["description"])
-                ]
-    return row_data
