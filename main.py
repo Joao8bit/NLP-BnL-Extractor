@@ -4,8 +4,13 @@ import os
 import src.xml.xml_manipulation as xml
 import src.csv.csv as csv
 import src.nlp.spacy as spacy
+import pandas as pd
 from multiprocessing import Process
 
+
+"""
+CSV CREATION STEPS
+"""
 def get_csv_data(root_dir, tree):
     """
     This function will gather all the information about a single XML file that will be written
@@ -85,6 +90,15 @@ def main_csv():
     
     print(f'Out of {range_total} files, {spacy.lang_record["de"]} were written in German, while {spacy.lang_record["fr"]} were written in French.\nThis means that around {int((range_total-spacy.lang_record["de"]-spacy.lang_record["fr"])/range_total*100)}% of files were not recognised as either German or French.')
 
+def replace():
+    df = pd.read_csv('advertisements1.csv')        
+    for row in df.iterrows():
+        print(row[1])
+        
 if __name__=="__main__":
-    main_csv()
-    
+    #main_csv()
+    df = pd.read_csv('advertisements1.csv')
+    #for column in len(df.columns)
+    print(df["Language"].dtype)
+    print(df.columns[4])
+    print(df.__dataframe__())

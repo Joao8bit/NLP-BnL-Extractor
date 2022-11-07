@@ -1,4 +1,4 @@
-from nltk import *
+import nltk
 import spacy
 from spacy.language import Language
 from spacy_language_detection import LanguageDetector
