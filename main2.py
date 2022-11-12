@@ -23,19 +23,23 @@ import spacy.cli
 spacy.cli.download("fr_core_web_md")
 import fr_core_news_md
 # fetch yelp review dataset and clean it
-ads1 = pd.read_csv('advertisements1.csv')
-yelp_review.head()
+df = pd.read_csv('advertisements1.csv')
 # print number of document and topics
-print(len(yelp_review))
-print("Unique Business")
-print(len(yelp_review.groupby('business_id')))
-print("Unique User")
-print(len(yelp_review.groupby('user_id')))
-
-
-
-
-yelp_review['text'] = yelp_review['text'].apply(clean_text)
+print(len(df))
+#Display Languages recognised
+print(len(df.groupby('Language')))
+# clean the document and remove punctuation
+def clean_text(text):
+  delete_dict = {sp_char: '' for sp_char in string.punctuation}
+  delete_dict[' '] =' '
+  table = str.maketrans(delete_dict)
+  text1 = text.translate(table)
+  textArr= text1.split()
+  text2 = ' '.join([w for w in textArr if ( not w.isdigit() and
+                                           ( not w.isdigit() and len(w)>3))])
+  return text2.lower()
+ 
+df['Language'] = yelp_review['text'].apply(clean_text)
 yelp_review['Num_words_text'] = yelp_review['text'].apply(lambda x:len(str(x).split()))
 
 print('-------Reviews By Stars --------')

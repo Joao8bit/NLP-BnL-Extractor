@@ -1,12 +1,18 @@
 #!/usr/bin/python3
-
+"""
+Import section:
+All imports were thought following good practice methods
+"""
 import os
 import src.xml.xml_manipulation as xml
 import src.csv.csv as csv
 import src.nlp.spacy as spacy
+import spacy as sp
 import pandas as pd
+import string
+import fr_core_news_md
 from multiprocessing import Process
-
+from nltk.corpus import stopwords
 
 """
 CSV CREATION STEPS
@@ -42,6 +48,7 @@ def full_range_lang(root_dir, files):
         spacy.get_lang(data)
     spacy.print_lang_count() 
 
+
 def write_to_csv(root_dir, file_list, csv_name):
     """
     Opens a csv file, writes the header (Source, Date, Publisher and Description).
@@ -58,47 +65,83 @@ def write_to_csv(root_dir, file_list, csv_name):
     f.close()
 
 def main_csv():
+    """
+    XML to CSV file transition, this gets the following header:
+    Source, Date, Publisher, Description, Language, Score
+    """
     #Variables declaration
     root_dir = './ADS/'
     files = os.listdir(root_dir)
     range1 = files[:30000]
     range2 = files[30000:60000]
     range3 = files[60000:90000]
-    #range4 = files[100000:100001]
-    range_total = len(range1+range2+range3)
+    range4 = files[100000:140000]
+    range_total = len(range1+range2+range3+range4)
 
     process_1 = Process(target=write_to_csv, args=(root_dir,  range1, './advertisements1.csv'))
     process_2 = Process(target=write_to_csv, args=(root_dir,  range2, './advertisements2.csv'))
     process_3 = Process(target=write_to_csv, args=(root_dir,  range3, './advertisements3.csv'))
+    process_4 = Process(target=write_to_csv, args=(root_dir,  range3, './advertisements4.csv'))
     print('Writing to CSV and analysing language...')
 
     process_1.start()
     process_2.start()
     process_3.start()
+    process_4.start()
     process_1.join()
     process_2.join()
     process_3.join()
-    
-    #Template of main function
-    #write_to_csv(root_dir, range1, './advertisements1.csv')
-    
+    process_4.join()
     print('Operation complete!')
-    
-    #full_range_lang(root_dir, range1)
-    #full_range_lang(root_dir, range2)
-    #full_range_lang(root_dir, range3)
-    
-    print(f'Out of {range_total} files, {spacy.lang_record["de"]} were written in German, while {spacy.lang_record["fr"]} were written in French.\nThis means that around {int((range_total-spacy.lang_record["de"]-spacy.lang_record["fr"])/range_total*100)}% of files were not recognised as either German or French.')
 
-def replace():
-    df = pd.read_csv('advertisements1.csv')        
-    for row in df.iterrows():
-        print(row[1])
-        
+"""
+LDA related functions
+These functions follow a certain order of process to complete the desired LDA model
+"""
+def clean_text(text):
+  delete_dict = {sp_char: '' for sp_char in string.punctuation}
+  delete_dict[' '] =' '
+  table = str.maketrans(delete_dict)
+  text1 = text.translate(table)
+  textArr= text1.split()
+  text2 = ' '.join([w for w in textArr if ( not w.isdigit() and
+                                           ( not w.isdigit() and len(w)>3))])
+  return text2.lower()
+
+def remove_stopwords(text):
+    textArr = text.split(' ')
+    rem_text = " ".join([i for i in textArr if i not in stop_words_fr])
+    rem_text = " ".join([i for i in textArr if i not in stop_words_de])
+    return rem_text
+
+nlp = fr_core_news_md.load(disable=['parser', 'ner'])
+def lemmatization(texts,allowed_postags=['NOUN', 'ADJ']):
+	output = []
+	for sent in texts:
+		doc = nlp(sent)
+		output.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
+	return output
+
 if __name__=="__main__":
+    #Run once to gather all CSV files
     #main_csv()
+
+    #Read CSV file
     df = pd.read_csv('advertisements1.csv')
-    #for column in len(df.columns)
-    print(df["Language"].dtype)
-    print(df.columns[4])
-    print(df.__dataframe__())
+
+    #Filter CSV by target Lnguage
+    df = df[(df['Language']=='fr') | (df['Language']=='de')]
+    #Clean text
+    df['Description'] = df['Description'].apply(clean_text)
+    #Remove stopwords
+    stop_words_fr = stopwords.words('french')
+    stop_words_de = stopwords.words('german')
+    df['Description'] = df['Description'].apply(remove_stopwords)
+
+    #Lemmatization
+    text_list = df['Description'].tolist()
+    print(text_list[2])
+    tokenized_reviews = lemmatization(text_list)
+    print(tokenized_reviews[2])
+    
+    df.to_csv('test.csv')
