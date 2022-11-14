@@ -11,6 +11,12 @@ import spacy as sp
 import pandas as pd
 import string
 import fr_core_news_md
+import matplotlib.pyplot as plt
+import gensim
+from gensim.models import CoherenceModel
+from gensim import corpora
+import pyLDAvis
+import pyLDAvis.gensim_models
 from multiprocessing import Process
 from nltk.corpus import stopwords
 
@@ -36,18 +42,6 @@ def get_csv_data(root_dir, tree):
     xml_data.append(spacy_data["score"])
     full_data = xml_data
     return full_data
-
-def full_range_lang(root_dir, files):
-    """
-    This function will extract an XML file list, its description,
-    and analyse its language using the text in the description.
-    """
-    for file in files:
-        tree = xml.ET.parse(f"{root_dir}/{file}")         
-        data = xml.extract_tag(tree, xml.tag_dict["description"])   
-        spacy.get_lang(data)
-    spacy.print_lang_count() 
-
 
 def write_to_csv(root_dir, file_list, csv_name):
     """
@@ -140,8 +134,36 @@ if __name__=="__main__":
 
     #Lemmatization
     text_list = df['Description'].tolist()
-    print(text_list[2])
-    tokenized_reviews = lemmatization(text_list)
-    print(tokenized_reviews[2])
+    print('Test list: ',text_list[2])
+    tokenized_ads = lemmatization(text_list)
+    print('List[2]: ',tokenized_ads[2])
     
+    # convert to document term frequency:
+    dictionary = corpora.Dictionary(tokenized_ads)
+    doc_term_matrix = [dictionary.doc2bow(rev) for rev in tokenized_ads]
+ 
+    # Creating the object for LDA model using gensim library
+    LDA = gensim.models.ldamodel.LdaModel
+ 
+    # Build LDA model
+    lda_model = LDA(corpus=doc_term_matrix, id2word=dictionary,
+                num_topics=10, random_state=100,
+                chunksize=1000, passes=50,iterations=2)
+    # print lda topics with respect to each word of document
+    lda_model.print_topics()
+    
+    doc_lda = lda_model[doc_term_matrix]
+    # calculate perplexity and coherence
+    print('\nPerplexity: ', lda_model.log_perplexity(doc_term_matrix,
+                                               total_docs=10000)) 
+ 
+    # calculate coherence
+    coherence_model_lda = CoherenceModel(model=lda_model,
+                                     texts=tokenized_ads, dictionary=dictionary ,
+                                     coherence='c_v')
+    coherence_lda = coherence_model_lda.get_coherence()
+    print('Coherence: ', coherence_lda)
+
+    # Now, we use pyLDA vis to visualize it
+    pyLDAvis.sklearn.prepare(gensim.lda_tf, gensim.dtm_tf, gensim.tf_vectorizer)
     df.to_csv('test.csv')
