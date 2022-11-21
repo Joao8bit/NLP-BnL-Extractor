@@ -13,9 +13,11 @@ import string
 import fr_core_news_md
 import matplotlib.pyplot as plt
 import gensim
+from stop_words import get_stop_words
 from gensim.models import CoherenceModel
 from gensim import corpora
 import pyLDAvis
+import pyLDAvis.sklearn
 import pyLDAvis.gensim_models
 from multiprocessing import Process
 from nltk.corpus import stopwords
@@ -88,6 +90,13 @@ def main_csv():
     process_4.join()
     print('Operation complete!')
 
+    def filter_csv(filename):
+        #Read CSV file
+        df = pd.read_csv(filename)
+        #Filter CSV by target Lnguage
+        df = df[(df['Language']=='fr') | (df['Language']=='de')]
+        df[df['Language']=='fr'].to_csv('Ads1FR.csv')
+        df[df['Language']=='de'].to_csv('Ads1DE.csv')
 """
 LDA related functions
 These functions follow a certain order of process to complete the desired LDA model
@@ -102,14 +111,14 @@ def clean_text(text):
                                            ( not w.isdigit() and len(w)>3))])
   return text2.lower()
 
+stop_words = set(get_stop_words('french')) | set(stopwords.words('french'))
 def remove_stopwords(text):
     textArr = text.split(' ')
-    rem_text = " ".join([i for i in textArr if i not in stop_words_fr])
-    rem_text = " ".join([i for i in textArr if i not in stop_words_de])
+    rem_text = " ".join([i for i in textArr if i not in stop_words])
     return rem_text
 
 nlp = fr_core_news_md.load(disable=['parser', 'ner'])
-def lemmatization(texts,allowed_postags=['NOUN', 'ADJ']):
+def lemmatization(texts,allowed_postags=['NOUN', 'ADJ', 'VERB']):
 	output = []
 	for sent in texts:
 		doc = nlp(sent)
@@ -117,53 +126,45 @@ def lemmatization(texts,allowed_postags=['NOUN', 'ADJ']):
 	return output
 
 if __name__=="__main__":
-    #Run once to gather all CSV files
-    #main_csv()
-
-    #Read CSV file
-    df = pd.read_csv('advertisements1.csv')
-
-    #Filter CSV by target Lnguage
-    df = df[(df['Language']=='fr') | (df['Language']=='de')]
+        #Open CSV file
+    df = pd.read_csv("Ads1FR.csv", nrows=10000)
+    print('Cleaning text and removing stopwords')
     #Clean text
     df['Description'] = df['Description'].apply(clean_text)
     #Remove stopwords
-    stop_words_fr = stopwords.words('french')
-    stop_words_de = stopwords.words('german')
     df['Description'] = df['Description'].apply(remove_stopwords)
-
     #Lemmatization
+    print('Done!')
+    print('\nApplying Lemmatization...')
+
     text_list = df['Description'].tolist()
     print('Test list: ',text_list[2])
     tokenized_ads = lemmatization(text_list)
     print('List[2]: ',tokenized_ads[2])
-    
     # convert to document term frequency:
     dictionary = corpora.Dictionary(tokenized_ads)
     doc_term_matrix = [dictionary.doc2bow(rev) for rev in tokenized_ads]
- 
     # Creating the object for LDA model using gensim library
     LDA = gensim.models.ldamodel.LdaModel
- 
     # Build LDA model
+    print('Building LDA model...')
     lda_model = LDA(corpus=doc_term_matrix, id2word=dictionary,
                 num_topics=10, random_state=100,
-                chunksize=1000, passes=50,iterations=2)
+                chunksize=1000, passes=100,iterations=250)
     # print lda topics with respect to each word of document
     lda_model.print_topics()
-    
+    print('Top topics:',lda_model.top_topics(doc_term_matrix))
     doc_lda = lda_model[doc_term_matrix]
     # calculate perplexity and coherence
     print('\nPerplexity: ', lda_model.log_perplexity(doc_term_matrix,
                                                total_docs=10000)) 
- 
     # calculate coherence
     coherence_model_lda = CoherenceModel(model=lda_model,
                                      texts=tokenized_ads, dictionary=dictionary ,
-                                     coherence='c_v')
+                                     coherence='u_mass', processes=4)
+    print('Calculating coherence...')
     coherence_lda = coherence_model_lda.get_coherence()
     print('Coherence: ', coherence_lda)
 
     # Now, we use pyLDA vis to visualize it
-    pyLDAvis.sklearn.prepare(gensim.lda_tf, gensim.dtm_tf, gensim.tf_vectorizer)
-    df.to_csv('test.csv')
+    pyLDAvis.sklearn.prepare(lda_tf, dtm_tf, tf_vectorizer)
