@@ -11,6 +11,7 @@ import spacy as sp
 import pandas as pd
 import string
 import fr_core_news_md
+import de_core_news_md
 import matplotlib.pyplot as plt
 import gensim
 from stop_words import get_stop_words
@@ -111,13 +112,11 @@ def clean_text(text):
                                            ( not w.isdigit() and len(w)>3))])
   return text2.lower()
 
-stop_words = set(get_stop_words('french')) | set(stopwords.words('french'))
 def remove_stopwords(text):
     textArr = text.split(' ')
     rem_text = " ".join([i for i in textArr if i not in stop_words])
     return rem_text
 
-nlp = fr_core_news_md.load(disable=['parser', 'ner'])
 def lemmatization(texts,allowed_postags=['NOUN', 'ADJ', 'VERB']):
 	output = []
 	for sent in texts:
@@ -125,9 +124,9 @@ def lemmatization(texts,allowed_postags=['NOUN', 'ADJ', 'VERB']):
 		output.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
 	return output
 
-if __name__=="__main__":
-        #Open CSV file
-    df = pd.read_csv("Ads1FR.csv", nrows=10000)
+
+
+def lda_total(topics_range):
     print('Cleaning text and removing stopwords')
     #Clean text
     df['Description'] = df['Description'].apply(clean_text)
@@ -139,6 +138,7 @@ if __name__=="__main__":
 
     text_list = df['Description'].tolist()
     print('Test list: ',text_list[2])
+    #nlp = de_core_news_md.load(disable=['parser', 'ner'])
     tokenized_ads = lemmatization(text_list)
     print('List[2]: ',tokenized_ads[2])
     # convert to document term frequency:
@@ -149,7 +149,7 @@ if __name__=="__main__":
     # Build LDA model
     print('Building LDA model...')
     lda_model = LDA(corpus=doc_term_matrix, id2word=dictionary,
-                num_topics=10, random_state=100,
+                num_topics=topics_range, random_state=100,
                 chunksize=1000, passes=100,iterations=250)
     # print lda topics with respect to each word of document
     lda_model.print_topics()
@@ -166,5 +166,22 @@ if __name__=="__main__":
     coherence_lda = coherence_model_lda.get_coherence()
     print('Coherence: ', coherence_lda)
 
+if __name__=="__main__":
+    #Open CSV file
+    
+    """ Language-dependent variables declarations """
+    # FR
+    df = pd.read_csv("Ads1FR.csv")
+    nlp = fr_core_news_md.load(disable=['parser', 'ner'])
+    stop_words = set(get_stop_words('french')) | set(stopwords.words('french'))
+    # DE
+    #df = pd.read_csv("Ads1DE.csv")
+    #nlp = de_core_news_md.load(disable=['parser', 'ner'])
+    #stop_words = set(get_stop_words('german')) | set(stopwords.words('german'))
+    """ End of declaration """
+
+    for i in range(10,55,5):
+        print(f'LDA Model with {i} topics:\n') 
+        lda_total(i)
     # Now, we use pyLDA vis to visualize it
     pyLDAvis.sklearn.prepare(lda_tf, dtm_tf, tf_vectorizer)
