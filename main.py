@@ -53,8 +53,18 @@ def write_to_csv(root_dir, file_list, csv_name):
 
 def main_csv():
     """
-    XML to CSV file transition, this gets the following header:
-    Source, Date, Publisher, Description, Language, Score
+    XML to CSV file transition
+    
+    This function writes csv files, divided in 30 000 rows each
+    Where each row is composed of:
+        - Source 
+        - Date 
+        - Publisher 
+        - Description
+        - Language
+        - Score
+    Each and every row gets its data extracted from the XML files in columns, 
+    While the Language and Score columns get their data using spaCy langdetect.
     """
     #Variables declaration
     root_dir = './ADS/'
