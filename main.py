@@ -101,9 +101,16 @@ def main_csv():
 
 if __name__=="__main__":
     #lda_total(5)
-    for i in range(10,55,5):
-        print(f'LDA Model with {i} topics:\n') 
-        lda_total(i)
-    
-    # Now, we use pyLDA vis to visualize it
+    #for i in range(10,55,5):
+    #    print(f'LDA Model with {i} topics:\n') 
+    #    lda_total(i)
+    process_1 = Process(target=lda_total, args=(25,))
+    process_2 = Process(target=lda_total, args=(30,))
+    process_3 = Process(target=lda_total, args=(35,))
+    process_1.start()
+    process_2.start()
+    process_3.start() 
+    process_1.join()
+    process_2.join()
+    process_3.join()   # Now, we use pyLDA vis to visualize it
     #pyLDAvis.sklearn.prepare(lda_tf, dtm_tf, tf_vectorizer)
