@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 import gensim
 from stop_words import get_stop_words
 from gensim.models import CoherenceModel
-from gensim import corpora
+import gensim
 import pyLDAvis
-import pyLDAvis.sklearn
 import pyLDAvis.gensim_models
 from nltk.corpus import stopwords
 """
@@ -18,12 +17,12 @@ These functions follow a certain order of process to complete the desired LDA mo
 """ Language-dependent variables declarations """
 # FR
 #df = pd.read_csv("Ads1FR.csv")
-#nlp = fr_core_news_md.load(disable=['parser', 'ner'])
-#stop_words = set(get_stop_words('french')) | set(stopwords.words('french'))
+nlp = fr_core_news_md.load(disable=['parser', 'ner'])
+stop_words = set(get_stop_words('french')) | set(stopwords.words('french'))
 # DE
-df = pd.read_csv("Ads1DE.csv")
-nlp = de_core_news_md.load(disable=['parser', 'ner'])
-stop_words = set(get_stop_words('german')) | set(stopwords.words('german'))
+#df = pd.read_csv("Ads1DE.csv")
+#nlp = de_core_news_md.load(disable=['parser', 'ner'])
+#stop_words = set(get_stop_words('german')) | set(stopwords.words('german'))
 """ End of declaration """
 
 def clean_text(text):
@@ -54,7 +53,7 @@ def lemmatization(texts,allowed_postags=['NOUN', 'ADJ', 'VERB']):
 		output.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
 	return output
 
-def lda_total(topics_range):
+def lda_total(df, topics_range):
   """
   Main LDA Model function, cleans text, which is expected to be a csv column,
   It then removes stopwords,
@@ -78,26 +77,31 @@ def lda_total(topics_range):
   tokenized_ads = lemmatization(text_list)
   print('List[2]: ',tokenized_ads[2])
   # convert to document term frequency:
-  dictionary = corpora.Dictionary(tokenized_ads)
-  doc_term_matrix = [dictionary.doc2bow(rev) for rev in tokenized_ads]
+  id2word = gensim.corpora.Dictionary(tokenized_ads)
+  corpus = [id2word.doc2bow(rev) for rev in tokenized_ads]
   # Creating the object for LDA model using gensim library
   LDA = gensim.models.ldamodel.LdaModel
   # Build LDA model
   print('Building LDA model...')
-  lda_model = LDA(corpus=doc_term_matrix, id2word=dictionary,
+  lda_model = LDA(corpus=corpus, id2word=id2word,
                 num_topics=topics_range, random_state=100,
                 chunksize=1000, passes=100,iterations=250)
   # print lda topics with respect to each word of document
   lda_model.print_topics()
-  print('Top topics:',lda_model.top_topics(doc_term_matrix))
-  doc_lda = lda_model[doc_term_matrix]
+  print('Top topics:',lda_model.top_topics(corpus))
+  doc_lda = lda_model[corpus]
+  
   # calculate perplexity and coherence
-  print('\nPerplexity: ', lda_model.log_perplexity(doc_term_matrix,
-                                               total_docs=10000)) 
+  print('\nPerplexity: ', lda_model.log_perplexity(corpus, total_docs=10000)) 
+  
   # calculate coherence
   coherence_model_lda = CoherenceModel(model=lda_model,
-                                     texts=tokenized_ads, dictionary=dictionary ,
+                                     texts=tokenized_ads, dictionary=id2word ,
                                      coherence='u_mass', processes=4)
   print('Calculating coherence...')
   coherence_lda = coherence_model_lda.get_coherence()
   print('Coherence: ', coherence_lda)
+
+  # Visualising the Data
+  pyLDAvis.enable_notebook()
+  pyLDAvis.gensim_models.prepare(lda_model, corpus, id2word)

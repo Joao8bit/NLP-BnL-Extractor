@@ -4,14 +4,15 @@ Import section:
 All imports were thought following good practice methods
 """
 import os
+import gensim
+import pyLDAvis
 import src.xml.xml_manipulation as xml
 import src.csv.csv as csv
 import src.nlp.spacy as spacy
-import spacy as sp
 import pandas as pd
-from src.nlp.lda import lda_total
+import src.nlp.lda as ld
+import pyLDAvis.gensim_models
 from multiprocessing import Process
-
 
 """
 CSV CREATION STEPS
@@ -91,26 +92,20 @@ def main_csv():
     process_4.join()
     print('Operation complete!')
 
-    def filter_csv(filename):
-        #Read CSV file
-        df = pd.read_csv(filename)
-        #Filter CSV by target Lnguage
-        df = df[(df['Language']=='fr') | (df['Language']=='de')]
-        df[df['Language']=='fr'].to_csv('Ads2FR.csv')
-        df[df['Language']=='de'].to_csv('Ads2DE.csv')
+def filter_csv(filename):
+    #Read CSV file
+    df = pd.read_csv(filename)
+    #Filter CSV by target Lnguage
+    df = df[(df['Language']=='fr') | (df['Language']=='de')]
+    df[df['Language']=='fr'].to_csv('Ads3FR.csv', index=False)
+    df[df['Language']=='de'].to_csv('Ads3DE.csv', index=False)
 
+def lopp(int1, int2, df):
+    for i in range(int1,int2,5):
+        print(f'LDA Model with {i} topics:\n') 
+        ld.lda_total(df, i)   
 if __name__=="__main__":
     #lda_total(5)
-    #for i in range(10,55,5):
-    #    print(f'LDA Model with {i} topics:\n') 
-    #    lda_total(i)
-    process_1 = Process(target=lda_total, args=(25,))
-    process_2 = Process(target=lda_total, args=(30,))
-    process_3 = Process(target=lda_total, args=(35,))
-    process_1.start()
-    process_2.start()
-    process_3.start() 
-    process_1.join()
-    process_2.join()
-    process_3.join()   # Now, we use pyLDA vis to visualize it
-    #pyLDAvis.sklearn.prepare(lda_tf, dtm_tf, tf_vectorizer)
+
+  df = pd.read_csv('AdsFullFR3.csv')    
+  ld.lda_total(df, 10)
