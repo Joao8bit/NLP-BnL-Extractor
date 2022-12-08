@@ -1,13 +1,16 @@
-#Generated files
+# Generated files
 export01-newspapers1841-1878/
 *COPYRIGHT*.*
 *.csv
 
-#Generated folders and files for analysis purposes
+# Generated folders and files for analysis purposes
 ADS/
 *ADVERTISEMENT*.xml
+*.html
 
-#Python stuff
+# Python stuff
 *pycache*/
 .env/
 
+# Generated Jupyter Notebook files
+.ipynb*/
