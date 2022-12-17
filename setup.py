@@ -11,8 +11,6 @@ def initial_setup():
     if(isExist == False):
         if(platform == "linux" or platform == "linux2" or platform == "darwin"):
             subprocess.run(['bash', 'setup.sh'])
-        #if(platform == "win32" or platform == "cygwin"):
-        #    subprocess.run(['setup.bat'])
     else:
         pass
 

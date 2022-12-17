@@ -4,14 +4,10 @@ Import section:
 All imports were thought following good practice methods
 """
 import os
-import gensim
-import pyLDAvis
 import src.xml.xml_manipulation as xml
 import src.csv.csv as csv
 import src.nlp.spacy as spacy
 import pandas as pd
-import src.nlp.lda as ld
-import pyLDAvis.gensim_models
 from multiprocessing import Process
 
 """
@@ -52,9 +48,17 @@ def write_to_csv(root_dir, file_list, csv_name):
             csv.writer(f).writerow(file_data)
     f.close()
 
+def filter_csv(filename, index):
+    #Read CSV file
+    df = pd.read_csv(filename)
+    #Filter CSV by target Lnguage
+    df = df[(df['Language']=='fr') | (df['Language']=='de')]
+    df[df['Language']=='fr'].to_csv('Ads'+str(index)+'FR.csv', index=False)
+    df[df['Language']=='de'].to_csv('Ads'+str(index)+'DE.csv', index=False)
+
 def main_csv():
     """
-    XML to CSV file transition
+    1. XML to CSV file transition
     
     This function writes csv files, divided in 30 000 rows each
     Where each row is composed of:
@@ -66,6 +70,19 @@ def main_csv():
         - Score
     Each and every row gets its data extracted from the XML files in columns, 
     While the Language and Score columns get their data using spaCy langdetect.
+
+    2. CSV extraction
+
+    The second step writes all CSV rows into several smaller-sized CSV files,
+    separated by four processes for performance reasons.
+
+    3. CSV language filter
+
+    The last step will create a single CSV file for each language,
+    gathering all data from all previous generated files.
+
+    DE: AdsFullDE
+    FR: AdsFullFR
     """
     #Variables declaration
     root_dir = './ADS/'
@@ -92,20 +109,18 @@ def main_csv():
     process_4.join()
     print('Operation complete!')
 
-def filter_csv(filename):
-    #Read CSV file
-    df = pd.read_csv(filename)
-    #Filter CSV by target Lnguage
-    df = df[(df['Language']=='fr') | (df['Language']=='de')]
-    df[df['Language']=='fr'].to_csv('Ads3FR.csv', index=False)
-    df[df['Language']=='de'].to_csv('Ads3DE.csv', index=False)
+    filter_csv('advertisements1.csv', 1)  
+    filter_csv('advertisements2.csv', 2)
+    filter_csv('advertisements3.csv', 3)
+    filter_csv('advertisements4.csv', 4)
 
-def lopp(int1, int2, df):
-    for i in range(int1,int2,5):
-        print(f'LDA Model with {i} topics:\n') 
-        ld.lda_total(df, i)   
+    csv.csv_concatenator('Ads1FR.csv', 'Ads2FR.csv', 'Ads12FR.csv')
+    csv.csv_concatenator('Ads3FR.csv', 'Ads4FR.csv', 'Ads34FR.csv')
+    csv.csv_concatenator('Ads12FR.csv', 'Ads12FR.csv', 'AdsFullFR.csv')
+
+    csv.csv_concatenator('Ads1DE.csv', 'Ads2DE.csv', 'Ads12DE.csv')
+    csv.csv_concatenator('Ads3DE.csv', 'Ads4DE.csv', 'Ads34DE.csv')
+    csv.csv_concatenator('Ads12DE.csv', 'Ads12DE.csv', 'AdsFullDE.csv')
+
 if __name__=="__main__":
-    #lda_total(5)
-
-  df = pd.read_csv('AdsFullFR3.csv')    
-  ld.lda_total(df, 10)
+  main_csv()
